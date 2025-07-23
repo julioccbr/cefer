@@ -20,7 +20,9 @@ export default function LoginPage() {
                 setError('');
 
                 // URL de callback para o OAuth
-                const callbackUrl = `${window.location.origin}/api/auth/usp/callback`;
+                const callbackUrl = typeof window !== 'undefined' && window.location
+                    ? `${window.location.origin}/api/auth/usp/callback`
+                    : 'http://localhost:3000/api/auth/usp/callback';
 
                 console.log('Iniciando autenticação USP...');
                 console.log('Callback URL:', callbackUrl);
@@ -35,7 +37,9 @@ export default function LoginPage() {
 
                 // Redirecionar para a página de autorização da USP
                 console.log('Redirecionando para:', result.authorizationUrl);
-                window.location.href = result.authorizationUrl;
+                if (typeof window !== 'undefined') {
+                    window.location.href = result.authorizationUrl;
+                }
 
             } catch (error) {
                 console.error('Erro no login USP:', error);
@@ -73,7 +77,7 @@ export default function LoginPage() {
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">Erro na conexão</h2>
                         <p className="text-gray-600 mb-6">{error}</p>
                         <button
-                            onClick={() => window.location.reload()}
+                            onClick={() => typeof window !== 'undefined' && window.location.reload()}
                             className="bg-[#F37021] text-white px-6 py-2 rounded-md hover:bg-[#e05a1a] transition-colors"
                         >
                             Tentar novamente

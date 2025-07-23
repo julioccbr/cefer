@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Back from '@/app/components/Back';
 import PrimaryButton from '@/app/components/PrimaryButton';
 
 export default function CompletarPerfilPage() {
+    const [isClient, setIsClient] = useState(false);
     const { user, completeProfile } = useAuth();
     const router = useRouter();
 
@@ -16,6 +17,10 @@ export default function CompletarPerfilPage() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const handleChange = (e) => {
         setFormData({
@@ -45,6 +50,10 @@ export default function CompletarPerfilPage() {
 
         setLoading(false);
     };
+
+    if (!isClient) {
+        return <div>Carregando...</div>;
+    }
 
     if (!user) {
         router.push('/login');

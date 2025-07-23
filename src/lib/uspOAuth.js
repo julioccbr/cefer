@@ -23,7 +23,7 @@ const ENVIRONMENTS = {
 
 // Determinar ambiente baseado na URL
 const getEnvironment = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && window.location) {
         return window.location.hostname.includes('localhost') || window.location.hostname.includes('dev')
             ? 'development'
             : 'production';

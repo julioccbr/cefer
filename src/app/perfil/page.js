@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/app/components/Navbar';
@@ -9,6 +9,7 @@ import SecondaryButton from '@/app/components/SecondaryButton';
 import { User, Edit, Save, X } from 'lucide-react';
 
 export default function PerfilPage() {
+    const [isClient, setIsClient] = useState(false);
     const { user, updateProfile, logout } = useAuth();
     const router = useRouter();
 
@@ -20,6 +21,10 @@ export default function PerfilPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const handleChange = (e) => {
         setFormData({
@@ -78,10 +83,16 @@ export default function PerfilPage() {
 
     const handleResetProfile = () => {
         // Remove o usuário do "banco" para simular primeiro acesso
-        localStorage.removeItem(`user_${user.id}`);
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(`user_${user.id}`);
+        }
         logout();
         router.push('/login');
     };
+
+    if (!isClient) {
+        return <div>Carregando...</div>;
+    }
 
     if (!user) {
         router.push('/login');

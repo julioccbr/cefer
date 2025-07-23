@@ -21,14 +21,16 @@ export const AuthProvider = ({ children }) => {
 
     // Verificar se há um usuário salvo no localStorage
     useEffect(() => {
-        const userData = localStorage.getItem('userData');
+        if (typeof window !== 'undefined') {
+            const userData = localStorage.getItem('userData');
 
-        if (userData) {
-            try {
-                setUser(JSON.parse(userData));
-            } catch (error) {
-                console.error('Erro ao parsear dados do usuário:', error);
-                localStorage.removeItem('userData');
+            if (userData) {
+                try {
+                    setUser(JSON.parse(userData));
+                } catch (error) {
+                    console.error('Erro ao parsear dados do usuário:', error);
+                    localStorage.removeItem('userData');
+                }
             }
         }
         setLoading(false);
@@ -37,6 +39,10 @@ export const AuthProvider = ({ children }) => {
     // Login USP com dados completos
     const loginUSP = async (uspUser) => {
         try {
+            if (typeof window === 'undefined') {
+                return { success: false, error: 'Executando no servidor' };
+            }
+
             // Verificar se o usuário já existe no banco
             const existingUser = localStorage.getItem(`user_${uspUser.id}`);
 
@@ -75,6 +81,10 @@ export const AuthProvider = ({ children }) => {
     // Completar perfil no primeiro acesso
     const completeProfile = async (profileData) => {
         try {
+            if (typeof window === 'undefined') {
+                return { success: false, error: 'Executando no servidor' };
+            }
+
             const updatedUser = {
                 ...user,
                 name: profileData.name || user.name,
@@ -98,6 +108,10 @@ export const AuthProvider = ({ children }) => {
     // Atualizar perfil
     const updateProfile = async (profileData) => {
         try {
+            if (typeof window === 'undefined') {
+                return { success: false, error: 'Executando no servidor' };
+            }
+
             const updatedUser = {
                 ...user,
                 name: profileData.name || user.name,
@@ -166,10 +180,10 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-        // Limpar dados OAuth da USP
         if (typeof window !== 'undefined') {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            // Limpar dados OAuth da USP
             localStorage.removeItem('usp_oauth_request_token');
             localStorage.removeItem('usp_oauth_access_token');
             localStorage.removeItem('usp_oauth_user_info');
@@ -177,7 +191,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     const getAuthToken = () => {
-        return localStorage.getItem('authToken');
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('authToken');
+        }
+        return null;
     };
 
     const value = {
