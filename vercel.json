@@ -17,7 +17,7 @@
         }
     ],
     "env": {
-        "NEXT_PUBLIC_API_URL": "@api-url",
-        "NEXT_PUBLIC_API_KEY": "@api-key"
+        "NEXT_PUBLIC_API_URL": "http://localhost:3000",
+        "NEXT_PUBLIC_API_KEY": "mock-api-key-for-testing"
     }
 }
