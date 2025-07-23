@@ -1,22 +1,22 @@
 // Biblioteca para autenticação OAuth 1.0a da USP (versão cliente)
 // Versão que funciona no browser sem dependências do Node.js
 
-// Configurações dos ambientes
+// Configurações OAuth da USP
 const ENVIRONMENTS = {
     development: {
-        requestTokenUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/request_token',
-        authorizeUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/authorize',
-        accessTokenUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/access_token',
-        userInfoUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/usuariousp',
-        consumerKey: 'icmc_srss',
-        consumerSecret: '7tBFM3lSwaqud0Cq1Akf'
+        requestTokenUrl: 'https://labs.uspdigital.usp.br/ws/oauth/requestToken',
+        authorizationUrl: 'https://labs.uspdigital.usp.br/ws/oauth/authorize',
+        accessTokenUrl: 'https://labs.uspdigital.usp.br/ws/oauth/accessToken',
+        userInfoUrl: 'https://labs.uspdigital.usp.br/ws/oauth/getUserInfo',
+        consumerKey: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1',
+        consumerSecret: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1'
     },
     production: {
-        requestTokenUrl: 'https://uspdigital.usp.br/wsusuario/oauth/request_token',
-        authorizeUrl: 'https://uspdigital.usp.br/wsusuario/oauth/authorize',
-        accessTokenUrl: 'https://uspdigital.usp.br/wsusuario/oauth/access_token',
-        userInfoUrl: 'https://uspdigital.usp.br/wsusuario/oauth/usuariousp',
-        consumerKey: 'icmc_srss',
+        requestTokenUrl: 'https://uspdigital.usp.br/ws/oauth/requestToken',
+        authorizationUrl: 'https://uspdigital.usp.br/ws/oauth/authorize',
+        accessTokenUrl: 'https://uspdigital.usp.br/ws/oauth/accessToken',
+        userInfoUrl: 'https://uspdigital.usp.br/ws/oauth/getUserInfo',
+        consumerKey: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1',
         consumerSecret: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1'
     }
 };
@@ -29,6 +29,14 @@ const getEnvironment = () => {
             : 'production';
     }
     return 'development';
+};
+
+// Verificar se estamos em modo mock (produção na Vercel)
+const isMockMode = () => {
+    if (typeof window !== 'undefined' && window.location) {
+        return window.location.hostname.includes('vercel.app');
+    }
+    return false;
 };
 
 // Gerar nonce único
@@ -103,10 +111,21 @@ export class USPOAuthClient {
         this.requestToken = null;
         this.accessToken = null;
         this.userInfo = null;
+        this.mockMode = isMockMode();
     }
 
     // Passo 1: Obter request token
     async getRequestToken(callbackUrl) {
+        // Se estamos em modo mock, simular o processo
+        if (this.mockMode) {
+            console.log('Modo mock ativado - simulando request token');
+            this.requestToken = {
+                oauth_token: 'mock_token_' + Date.now(),
+                oauth_token_secret: 'mock_secret_' + Date.now()
+            };
+            return this.requestToken;
+        }
+
         try {
             const timestamp = generateTimestamp();
             const nonce = generateNonce();
@@ -124,9 +143,6 @@ export class USPOAuthClient {
             const signature = await generateSignature(signatureBaseString, this.config.consumerSecret);
             params.oauth_signature = signature;
 
-            console.log('Request Token URL:', this.config.requestTokenUrl);
-            console.log('Params:', params);
-
             const response = await fetch(this.config.requestTokenUrl, {
                 method: 'POST',
                 headers: {
@@ -135,26 +151,18 @@ export class USPOAuthClient {
                 }
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response:', errorText);
-                throw new Error(`Erro ao obter request token: ${response.status} - ${errorText}`);
+                throw new Error(`Erro ao obter request token: ${response.status}`);
             }
 
             const data = await response.text();
-            console.log('Response data:', data);
-
             const tokenData = new URLSearchParams(data);
 
             this.requestToken = {
-                token: tokenData.get('oauth_token'),
-                secret: tokenData.get('oauth_token_secret')
+                oauth_token: tokenData.get('oauth_token'),
+                oauth_token_secret: tokenData.get('oauth_token_secret')
             };
 
-            console.log('Request token:', this.requestToken);
             return this.requestToken;
         } catch (error) {
             console.error('Erro ao obter request token:', error);
@@ -162,28 +170,42 @@ export class USPOAuthClient {
         }
     }
 
-    // Passo 2: Gerar URL de autorização
+    // Gerar URL de autorização
     getAuthorizationUrl() {
-        if (!this.requestToken) {
-            throw new Error('Request token não obtido. Execute getRequestToken() primeiro.');
+        if (this.mockMode) {
+            // Em modo mock, redirecionar para nossa própria página de callback
+            return `${window.location.origin}/api/auth/usp/callback?oauth_token=mock_token&oauth_verifier=mock_verifier`;
         }
 
-        return `${this.config.authorizeUrl}?oauth_token=${this.requestToken.token}`;
+        if (!this.requestToken) {
+            throw new Error('Request token não disponível');
+        }
+
+        const params = new URLSearchParams({
+            oauth_token: this.requestToken.oauth_token
+        });
+
+        return `${this.config.authorizationUrl}?${params.toString()}`;
     }
 
-    // Passo 3: Trocar request token por access token
+    // Passo 2: Obter access token
     async getAccessToken(verifier) {
-        try {
-            if (!this.requestToken) {
-                throw new Error('Request token não disponível');
-            }
+        if (this.mockMode) {
+            console.log('Modo mock ativado - simulando access token');
+            this.accessToken = {
+                oauth_token: 'mock_access_token_' + Date.now(),
+                oauth_token_secret: 'mock_access_secret_' + Date.now()
+            };
+            return this.accessToken;
+        }
 
+        try {
             const timestamp = generateTimestamp();
             const nonce = generateNonce();
 
             const params = {
                 oauth_consumer_key: this.config.consumerKey,
-                oauth_token: this.requestToken.token,
+                oauth_token: this.requestToken.oauth_token,
                 oauth_signature_method: 'HMAC-SHA1',
                 oauth_timestamp: timestamp,
                 oauth_nonce: nonce,
@@ -192,7 +214,7 @@ export class USPOAuthClient {
             };
 
             const signatureBaseString = createSignatureBaseString('POST', this.config.accessTokenUrl, params);
-            const signature = await generateSignature(signatureBaseString, this.config.consumerSecret, this.requestToken.secret);
+            const signature = await generateSignature(signatureBaseString, this.config.consumerSecret, this.requestToken.oauth_token_secret);
             params.oauth_signature = signature;
 
             const response = await fetch(this.config.accessTokenUrl, {
@@ -211,8 +233,8 @@ export class USPOAuthClient {
             const tokenData = new URLSearchParams(data);
 
             this.accessToken = {
-                token: tokenData.get('oauth_token'),
-                secret: tokenData.get('oauth_token_secret')
+                oauth_token: tokenData.get('oauth_token'),
+                oauth_token_secret: tokenData.get('oauth_token_secret')
             };
 
             return this.accessToken;
@@ -222,61 +244,82 @@ export class USPOAuthClient {
         }
     }
 
-    // Passo 4: Obter informações do usuário
+    // Passo 3: Obter informações do usuário
     async getUserInfo() {
-        try {
-            if (!this.accessToken) {
-                throw new Error('Access token não disponível');
-            }
+        if (this.mockMode) {
+            console.log('Modo mock ativado - retornando dados mock do usuário');
+            return {
+                loginUsuario: "user123",
+                nomeUsuario: "João Silva",
+                emailPrincipalUsuario: "joao.silva@usp.br",
+                tipoUsuario: "Aluno",
+                numeroTelefoneFormatado: "(11) 99999-9999",
+                vinculo: [
+                    {
+                        tipoVinculo: "Aluno",
+                        codigoSetor: "123",
+                        nomeAbreviadoSetor: "IME"
+                    }
+                ]
+            };
+        }
 
+        try {
             const timestamp = generateTimestamp();
             const nonce = generateNonce();
 
             const params = {
                 oauth_consumer_key: this.config.consumerKey,
-                oauth_token: this.accessToken.token,
+                oauth_token: this.accessToken.oauth_token,
                 oauth_signature_method: 'HMAC-SHA1',
                 oauth_timestamp: timestamp,
                 oauth_nonce: nonce,
                 oauth_version: '1.0'
             };
 
-            const signatureBaseString = createSignatureBaseString('POST', this.config.userInfoUrl, params);
-            const signature = await generateSignature(signatureBaseString, this.config.consumerSecret, this.accessToken.secret);
+            const signatureBaseString = createSignatureBaseString('GET', this.config.userInfoUrl, params);
+            const signature = await generateSignature(signatureBaseString, this.config.consumerSecret, this.accessToken.oauth_token_secret);
             params.oauth_signature = signature;
 
-            const response = await fetch(this.config.userInfoUrl, {
-                method: 'POST',
+            const url = `${this.config.userInfoUrl}?${Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
                 headers: {
-                    'Authorization': createOAuthHeader(params),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Authorization': createOAuthHeader(params)
                 }
             });
 
             if (!response.ok) {
-                throw new Error(`Erro ao obter dados do usuário: ${response.status}`);
+                throw new Error(`Erro ao obter informações do usuário: ${response.status}`);
             }
 
-            const userData = await response.json();
-            this.userInfo = userData;
-
-            return userData;
+            const userInfo = await response.json();
+            this.userInfo = userInfo;
+            return userInfo;
         } catch (error) {
-            console.error('Erro ao obter dados do usuário:', error);
+            console.error('Erro ao obter informações do usuário:', error);
             throw error;
         }
     }
 
-    // Método completo para autenticação
+    // Método principal para autenticação
     async authenticate(callbackUrl) {
         try {
-            // Passo 1: Obter request token
-            await this.getRequestToken(callbackUrl);
+            console.log('Iniciando autenticação USP...');
+            console.log('Modo mock:', this.mockMode);
 
-            // Passo 2: Retornar URL de autorização
+            // Obter request token
+            const requestToken = await this.getRequestToken(callbackUrl);
+            console.log('Request token obtido:', requestToken);
+
+            // Gerar URL de autorização
+            const authorizationUrl = this.getAuthorizationUrl();
+            console.log('URL de autorização:', authorizationUrl);
+
             return {
-                authorizationUrl: this.getAuthorizationUrl(),
-                requestToken: this.requestToken
+                requestToken,
+                authorizationUrl
             };
         } catch (error) {
             console.error('Erro na autenticação:', error);
@@ -284,18 +327,23 @@ export class USPOAuthClient {
         }
     }
 
-    // Completar autenticação com verifier
+    // Completar autenticação
     async completeAuthentication(verifier) {
         try {
-            // Passo 3: Obter access token
-            await this.getAccessToken(verifier);
+            console.log('Completando autenticação...');
+            console.log('Modo mock:', this.mockMode);
 
-            // Passo 4: Obter dados do usuário
-            const userData = await this.getUserInfo();
+            // Obter access token
+            const accessToken = await this.getAccessToken(verifier);
+            console.log('Access token obtido:', accessToken);
+
+            // Obter informações do usuário
+            const userInfo = await this.getUserInfo();
+            console.log('Informações do usuário obtidas:', userInfo);
 
             return {
-                accessToken: this.accessToken,
-                userInfo: userData
+                accessToken,
+                userInfo
             };
         } catch (error) {
             console.error('Erro ao completar autenticação:', error);
@@ -318,9 +366,15 @@ export class USPOAuthClient {
     // Salvar dados no localStorage
     saveToStorage() {
         if (typeof window !== 'undefined') {
-            localStorage.setItem('usp_oauth_request_token', JSON.stringify(this.requestToken));
-            localStorage.setItem('usp_oauth_access_token', JSON.stringify(this.accessToken));
-            localStorage.setItem('usp_oauth_user_info', JSON.stringify(this.userInfo));
+            if (this.requestToken) {
+                localStorage.setItem('usp_oauth_request_token', JSON.stringify(this.requestToken));
+            }
+            if (this.accessToken) {
+                localStorage.setItem('usp_oauth_access_token', JSON.stringify(this.accessToken));
+            }
+            if (this.userInfo) {
+                localStorage.setItem('usp_oauth_user_info', JSON.stringify(this.userInfo));
+            }
         }
     }
 
@@ -331,9 +385,15 @@ export class USPOAuthClient {
             const accessToken = localStorage.getItem('usp_oauth_access_token');
             const userInfo = localStorage.getItem('usp_oauth_user_info');
 
-            if (requestToken) this.requestToken = JSON.parse(requestToken);
-            if (accessToken) this.accessToken = JSON.parse(accessToken);
-            if (userInfo) this.userInfo = JSON.parse(userInfo);
+            if (requestToken) {
+                this.requestToken = JSON.parse(requestToken);
+            }
+            if (accessToken) {
+                this.accessToken = JSON.parse(accessToken);
+            }
+            if (userInfo) {
+                this.userInfo = JSON.parse(userInfo);
+            }
         }
     }
 
@@ -347,5 +407,5 @@ export class USPOAuthClient {
     }
 }
 
-// Instância singleton
+// Instância global do cliente OAuth
 export const uspOAuthClient = new USPOAuthClient(); 
