@@ -1,0 +1,77 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import "tailwindcss";
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #141414;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+h5 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h6 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.link {
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.textoIV {
+  color: #555555;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.textoIII {
+  color: #555555;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.textoII {
+  color: #555555;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.textoI {
+  color: #555555;
+  font-size: 8px;
+  font-weight: 400;
+}
