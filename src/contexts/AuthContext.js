@@ -22,6 +22,22 @@ export const AuthProvider = ({ children }) => {
     // Verificar se há um usuário salvo no localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            // Modo mock: sempre salva um usuário fixo
+            if (window.location.hostname.includes('vercel.app')) {
+                const mockUser = {
+                    id: 'mock_user',
+                    name: 'Usuário Mock',
+                    email: 'mock@usp.br',
+                    type: 'Aluno',
+                    phone: '(11) 99999-9999',
+                    vinculos: [],
+                    uspData: { loginUsuario: 'mock_user' }
+                };
+                setUser(mockUser);
+                localStorage.setItem('userData', JSON.stringify(mockUser));
+                setLoading(false);
+                return;
+            }
             const userData = localStorage.getItem('userData');
 
             if (userData) {
