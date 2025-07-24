@@ -25,9 +25,11 @@ function USPCompleteAuthContent() {
                     throw new Error('Parâmetros OAuth ausentes');
                 }
 
+                // Carregar request token do localStorage
                 uspOAuthClient.loadFromStorage();
 
-                if (!uspOAuthClient.requestToken) {
+                // Se estiver em modo mock, não exija o request token real
+                if (!uspOAuthClient.requestToken && !uspOAuthClient.mockMode) {
                     throw new Error('Request token não encontrado. Tente fazer login novamente.');
                 }
 
