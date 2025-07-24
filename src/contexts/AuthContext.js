@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
                     localStorage.removeItem('userData');
                 }
             }
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
     // Login USP com dados completos

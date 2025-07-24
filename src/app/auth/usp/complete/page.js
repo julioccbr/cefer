@@ -25,20 +25,15 @@ function USPCompleteAuthContent() {
                     throw new Error('Parâmetros OAuth ausentes');
                 }
 
-                // Carregar request token do localStorage
                 uspOAuthClient.loadFromStorage();
 
                 if (!uspOAuthClient.requestToken) {
                     throw new Error('Request token não encontrado. Tente fazer login novamente.');
                 }
 
-                // Completar autenticação
                 const authResult = await uspOAuthClient.completeAuthentication(oauthVerifier);
-
-                // Salvar dados no localStorage
                 uspOAuthClient.saveToStorage();
 
-                // Converter dados da USP para o formato esperado pelo contexto de autenticação
                 const userData = authResult.userInfo;
                 const user = {
                     id: userData.loginUsuario,
@@ -47,35 +42,29 @@ function USPCompleteAuthContent() {
                     type: userData.tipoUsuario,
                     phone: userData.numeroTelefoneFormatado,
                     vinculos: userData.vinculo || [],
-                    // Dados específicos da USP
                     uspData: userData
                 };
 
-                // Fazer login no contexto
                 const loginResult = await loginUSP(user);
-
                 setStatus('success');
 
-                // Redirecionar baseado no resultado do login
+                // Redirecionar só após o contexto estar atualizado
                 setTimeout(() => {
                     if (loginResult.isFirstAccess) {
                         router.push('/completar-perfil');
                     } else {
                         router.push('/');
                     }
-                }, 2000);
+                }, 1000);
 
             } catch (error) {
                 console.error('Erro ao completar autenticação:', error);
                 setError(error.message);
                 setStatus('error');
-
-                // Limpar dados da sessão
                 uspOAuthClient.clearSession();
                 uspOAuthClient.clearStorage();
             }
         };
-
         completeAuth();
     }, [searchParams, loginUSP, router]);
 

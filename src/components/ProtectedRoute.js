@@ -25,7 +25,7 @@ export default function ProtectedRoute({ children }) {
         );
     }
 
-    if (!user) {
+    if (!user && !loading) {
         return null; // Não renderiza nada enquanto redireciona
     }
 
