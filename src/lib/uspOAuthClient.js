@@ -31,12 +31,9 @@ const getEnvironment = () => {
     return 'development';
 };
 
-// Verificar se estamos em modo mock (produção na Vercel)
+// Verificar se estamos em modo mock (forçar para teste)
 const isMockMode = () => {
-    if (typeof window !== 'undefined' && window.location) {
-        return window.location.hostname.includes('vercel.app');
-    }
-    return false;
+    return true; // Força o modo mock para teste
 };
 
 // Gerar nonce único
