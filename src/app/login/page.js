@@ -34,22 +34,29 @@ function LoginPageContent() {
         setError('');
 
         try {
+            console.log('🔍 Login - Iniciando processo de login USP');
+
             const callbackUrl = typeof window !== "undefined" && window.location
                 ? `${window.location.origin}/api/auth/usp/callback`
                 : "";
 
-            console.log('🔍 Debug - Iniciando autenticação USP');
-            console.log('🔍 Debug - Callback URL:', callbackUrl);
+            console.log('🔍 Login - Callback URL:', callbackUrl);
+            console.log('🔍 Login - Window location:', window.location);
+            console.log('🔍 Login - Window origin:', window.location.origin);
 
+            console.log('🔍 Login - Chamando uspOAuthClient.authenticate...');
             const result = await uspOAuthClient.authenticate(callbackUrl);
 
-            console.log('🔍 Debug - Resultado da autenticação:', result);
+            console.log('🔍 Login - Resultado da autenticação:', result);
+            console.log('🔍 Login - Authorization URL:', result.authorizationUrl);
 
             if (typeof window !== "undefined") {
+                console.log('🔍 Login - Redirecionando para:', result.authorizationUrl);
                 window.location.href = result.authorizationUrl;
             }
         } catch (error) {
-            console.error('❌ Erro detalhado ao iniciar autenticação USP:', error);
+            console.error('❌ Login - Erro detalhado ao iniciar autenticação USP:', error);
+            console.error('❌ Login - Stack trace:', error.stack);
 
             // Mostrar erro mais específico
             let errorMessage = 'Erro ao conectar com a USP. Tente novamente.';
