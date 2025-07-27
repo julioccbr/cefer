@@ -50,14 +50,6 @@ function LoginPageContent() {
         }
     };
 
-    const handleMockLogin = () => {
-        setLoading(true);
-        // Redirecionar para o modo mock
-        if (typeof window !== "undefined") {
-            window.location.href = `${window.location.origin}/api/auth/usp/callback?oauth_token=mock_token&oauth_verifier=mock_verifier`;
-        }
-    };
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="max-w-md w-full space-y-8">
@@ -96,26 +88,6 @@ function LoginPageContent() {
                                     Entrar com Senha Única USP
                                 </div>
                             )}
-                        </button>
-
-                        {/* Botão de teste para desenvolvimento */}
-                        {typeof window !== "undefined" && window.location.hostname.includes('localhost') && (
-                            <button
-                                onClick={handleMockLogin}
-                                disabled={loading}
-                                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F37021] disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Carregando...' : 'Modo Teste (Desenvolvimento)'}
-                            </button>
-                        )}
-
-                        {/* Botão de teste para produção */}
-                        <button
-                            onClick={handleMockLogin}
-                            disabled={loading}
-                            className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F37021] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Carregando...' : 'Modo Teste (Sem API USP)'}
                         </button>
                     </div>
 
