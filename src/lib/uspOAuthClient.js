@@ -309,24 +309,41 @@ export class USPOAuthClient {
         }
     }
 
-    // Método principal para autenticação
+    // Método principal de autenticação
     async authenticate(callbackUrl) {
         try {
             console.log('Iniciando autenticação USP...');
             console.log('Modo mock:', this.mockMode);
 
-            // Obter request token
-            const requestToken = await this.getRequestToken(callbackUrl);
-            console.log('Request token obtido:', requestToken);
+            // Usar API route do servidor para evitar CORS
+            const response = await fetch('/api/auth/usp/request-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ callbackUrl })
+            });
 
-            // Gerar URL de autorização
-            const authorizationUrl = this.getAuthorizationUrl();
-            console.log('URL de autorização:', authorizationUrl);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erro na requisição ao servidor');
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Erro ao obter request token');
+            }
+
+            // Salvar request token para uso posterior
+            this.requestToken = data.requestToken;
+            this.saveToStorage();
 
             return {
-                requestToken,
-                authorizationUrl
+                requestToken: this.requestToken,
+                authorizationUrl: data.authorizationUrl
             };
+
         } catch (error) {
             console.error('Erro na autenticação:', error);
             throw error;
