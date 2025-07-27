@@ -22,18 +22,24 @@ export async function POST(request) {
         const requestToken = await uspOAuth.getRequestToken(callbackUrl);
 
         console.log('✅ Servidor - Request token obtido:', requestToken);
+        console.log('🔍 Servidor - oauth_token_secret presente:', !!requestToken.oauth_token_secret);
+        console.log('🔍 Servidor - oauth_token_secret valor:', requestToken.oauth_token_secret);
 
         // Gerar URL de autorização
         const authorizationUrl = uspOAuth.getAuthorizationUrl();
 
         console.log('✅ Servidor - URL de autorização:', authorizationUrl);
 
-        return NextResponse.json({
+        const response = {
             success: true,
             requestToken,
             authorizationUrl,
             oauthTokenSecret: requestToken.oauth_token_secret // Adicionar o secret
-        });
+        };
+
+        console.log('🔍 Servidor - Resposta completa:', response);
+
+        return NextResponse.json(response);
 
     } catch (error) {
         console.error('❌ Servidor - Erro ao obter request token:', error);

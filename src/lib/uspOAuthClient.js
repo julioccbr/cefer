@@ -335,6 +335,10 @@ export class USPOAuthClient {
                 throw new Error(data.error || 'Erro ao obter request token');
             }
 
+            console.log('🔍 Cliente - Dados recebidos da API:', data);
+            console.log('🔍 Cliente - oauthTokenSecret presente:', !!data.oauthTokenSecret);
+            console.log('🔍 Cliente - oauthTokenSecret valor:', data.oauthTokenSecret);
+
             // Salvar request token para uso posterior
             this.requestToken = data.requestToken;
             this.oauthTokenSecret = data.oauthTokenSecret; // Armazenar o secret
