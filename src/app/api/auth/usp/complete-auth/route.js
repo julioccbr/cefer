@@ -3,11 +3,12 @@ import { USPOAuth } from '@/lib/uspOAuth';
 
 export async function POST(request) {
     try {
-        const { oauthToken, oauthVerifier } = await request.json();
+        const { oauthToken, oauthVerifier, oauthTokenSecret } = await request.json();
 
         console.log('🔍 Servidor - Iniciando completar autenticação');
         console.log('🔍 Servidor - Token:', oauthToken);
         console.log('🔍 Servidor - Verifier:', oauthVerifier);
+        console.log('🔍 Servidor - Token Secret:', oauthTokenSecret ? 'Presente' : 'Ausente');
 
         if (!oauthToken || !oauthVerifier) {
             console.error('❌ Servidor - Parâmetros OAuth ausentes');
@@ -23,10 +24,10 @@ export async function POST(request) {
         console.log('🔍 Servidor - Ambiente:', uspOAuth.env);
         console.log('🔍 Servidor - Config:', uspOAuth.config);
 
-        // Definir o request token (que foi obtido anteriormente)
+        // Definir o request token com o secret correto
         uspOAuth.requestToken = {
             oauth_token: oauthToken,
-            oauth_token_secret: '' // Não precisamos do secret para completar
+            oauth_token_secret: oauthTokenSecret || '' // Usar o secret se disponível
         };
         console.log('🔍 Servidor - Request token definido:', uspOAuth.requestToken);
 

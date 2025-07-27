@@ -337,6 +337,7 @@ export class USPOAuthClient {
 
             // Salvar request token para uso posterior
             this.requestToken = data.requestToken;
+            this.oauthTokenSecret = data.oauthTokenSecret; // Armazenar o secret
             this.saveToStorage();
 
             return {
@@ -392,6 +393,9 @@ export class USPOAuthClient {
             if (this.requestToken) {
                 localStorage.setItem('usp_oauth_request_token', JSON.stringify(this.requestToken));
             }
+            if (this.oauthTokenSecret) {
+                localStorage.setItem('usp_oauth_token_secret', this.oauthTokenSecret);
+            }
             if (this.accessToken) {
                 localStorage.setItem('usp_oauth_access_token', JSON.stringify(this.accessToken));
             }
@@ -404,18 +408,24 @@ export class USPOAuthClient {
     // Carregar dados do localStorage
     loadFromStorage() {
         if (typeof window !== 'undefined') {
-            const requestToken = localStorage.getItem('usp_oauth_request_token');
-            const accessToken = localStorage.getItem('usp_oauth_access_token');
-            const userInfo = localStorage.getItem('usp_oauth_user_info');
+            const requestTokenData = localStorage.getItem('usp_oauth_request_token');
+            if (requestTokenData) {
+                this.requestToken = JSON.parse(requestTokenData);
+            }
 
-            if (requestToken) {
-                this.requestToken = JSON.parse(requestToken);
+            const tokenSecret = localStorage.getItem('usp_oauth_token_secret');
+            if (tokenSecret) {
+                this.oauthTokenSecret = tokenSecret;
             }
-            if (accessToken) {
-                this.accessToken = JSON.parse(accessToken);
+
+            const accessTokenData = localStorage.getItem('usp_oauth_access_token');
+            if (accessTokenData) {
+                this.accessToken = JSON.parse(accessTokenData);
             }
-            if (userInfo) {
-                this.userInfo = JSON.parse(userInfo);
+
+            const userInfoData = localStorage.getItem('usp_oauth_user_info');
+            if (userInfoData) {
+                this.userInfo = JSON.parse(userInfoData);
             }
         }
     }

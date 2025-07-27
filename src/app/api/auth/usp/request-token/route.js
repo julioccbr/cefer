@@ -31,7 +31,8 @@ export async function POST(request) {
         return NextResponse.json({
             success: true,
             requestToken,
-            authorizationUrl
+            authorizationUrl,
+            oauthTokenSecret: requestToken.oauth_token_secret // Adicionar o secret
         });
 
     } catch (error) {

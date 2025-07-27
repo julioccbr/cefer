@@ -52,12 +52,21 @@ function USPCompleteAuthContent() {
                     console.log('🔍 Cliente - Token:', oauthToken);
                     console.log('🔍 Cliente - Verifier:', oauthVerifier);
 
+                    // Carregar dados do localStorage
+                    uspOAuthClient.loadFromStorage();
+                    const oauthTokenSecret = uspOAuthClient.oauthTokenSecret;
+                    console.log('🔍 Cliente - Token Secret:', oauthTokenSecret ? 'Presente' : 'Ausente');
+
                     const response = await fetch('/api/auth/usp/complete-auth', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ oauthToken, oauthVerifier })
+                        body: JSON.stringify({
+                            oauthToken,
+                            oauthVerifier,
+                            oauthTokenSecret
+                        })
                     });
 
                     console.log('🔍 Cliente - Status da resposta:', response.status);
