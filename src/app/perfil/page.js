@@ -81,15 +81,6 @@ export default function PerfilPage() {
         router.push('/login');
     };
 
-    const handleResetProfile = () => {
-        // Remove o usuário do "banco" para simular primeiro acesso
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem(`user_${user.id}`);
-        }
-        logout();
-        router.push('/login');
-    };
-
     if (!isClient) {
         return <div>Carregando...</div>;
     }
@@ -191,30 +182,15 @@ export default function PerfilPage() {
                                     />
                                 </div>
                             ) : (
-                                <div className="flex flex-col space-y-3">
-                                    <div className="flex space-x-3">
-                                        <PrimaryButton
-                                            texto="Editar Perfil"
-                                            onClick={handleEdit}
-                                        />
-                                        <SecondaryButton
-                                            texto="Sair"
-                                            onClick={handleLogout}
-                                        />
-                                    </div>
-
-                                    {/* Botão para resetar perfil (apenas para testes) */}
-                                    <div className="pt-4 border-t border-gray-200">
-                                        <button
-                                            onClick={handleResetProfile}
-                                            className="w-full px-4 py-2 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition-colors"
-                                        >
-                                            🔄 Resetar Perfil (Teste)
-                                        </button>
-                                        <p className="text-xs text-gray-500 mt-1 text-center">
-                                            Remove dados do perfil para simular primeiro acesso
-                                        </p>
-                                    </div>
+                                <div className="flex space-x-3">
+                                    <PrimaryButton
+                                        texto="Editar Perfil"
+                                        onClick={handleEdit}
+                                    />
+                                    <SecondaryButton
+                                        texto="Sair"
+                                        onClick={handleLogout}
+                                    />
                                 </div>
                             )}
                         </div>

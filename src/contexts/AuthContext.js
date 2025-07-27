@@ -181,12 +181,29 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setUser(null);
         if (typeof window !== 'undefined') {
+            // Limpar todos os dados de autenticação
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
+
             // Limpar dados OAuth da USP
             localStorage.removeItem('usp_oauth_request_token');
             localStorage.removeItem('usp_oauth_access_token');
             localStorage.removeItem('usp_oauth_user_info');
+
+            // Limpar dados específicos do usuário (para simular banco)
+            if (user && user.id) {
+                localStorage.removeItem(`user_${user.id}`);
+            }
+
+            // Limpar qualquer outro dado relacionado à autenticação
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('usp_') || key.startsWith('user_'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
         }
     };
 
