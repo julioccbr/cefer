@@ -338,6 +338,8 @@ export class USPOAuthClient {
             // Salvar request token para uso posterior
             this.requestToken = data.requestToken;
             this.oauthTokenSecret = data.oauthTokenSecret; // Armazenar o secret
+            console.log('🔍 Cliente - Request token salvo:', this.requestToken);
+            console.log('🔍 Cliente - Token secret salvo:', this.oauthTokenSecret);
             this.saveToStorage();
 
             return {
@@ -390,17 +392,22 @@ export class USPOAuthClient {
     // Salvar dados no localStorage
     saveToStorage() {
         if (typeof window !== 'undefined') {
+            console.log('🔍 Cliente - Salvando no localStorage...');
             if (this.requestToken) {
                 localStorage.setItem('usp_oauth_request_token', JSON.stringify(this.requestToken));
+                console.log('🔍 Cliente - Request token salvo no localStorage');
             }
             if (this.oauthTokenSecret) {
                 localStorage.setItem('usp_oauth_token_secret', this.oauthTokenSecret);
+                console.log('🔍 Cliente - Token secret salvo no localStorage');
             }
             if (this.accessToken) {
                 localStorage.setItem('usp_oauth_access_token', JSON.stringify(this.accessToken));
+                console.log('🔍 Cliente - Access token salvo no localStorage');
             }
             if (this.userInfo) {
                 localStorage.setItem('usp_oauth_user_info', JSON.stringify(this.userInfo));
+                console.log('🔍 Cliente - User info salvo no localStorage');
             }
         }
     }
@@ -408,24 +415,32 @@ export class USPOAuthClient {
     // Carregar dados do localStorage
     loadFromStorage() {
         if (typeof window !== 'undefined') {
+            console.log('🔍 Cliente - Carregando do localStorage...');
+
             const requestTokenData = localStorage.getItem('usp_oauth_request_token');
             if (requestTokenData) {
                 this.requestToken = JSON.parse(requestTokenData);
+                console.log('🔍 Cliente - Request token carregado do localStorage');
             }
 
             const tokenSecret = localStorage.getItem('usp_oauth_token_secret');
             if (tokenSecret) {
                 this.oauthTokenSecret = tokenSecret;
+                console.log('🔍 Cliente - Token secret carregado do localStorage');
+            } else {
+                console.log('❌ Cliente - Token secret NÃO encontrado no localStorage');
             }
 
             const accessTokenData = localStorage.getItem('usp_oauth_access_token');
             if (accessTokenData) {
                 this.accessToken = JSON.parse(accessTokenData);
+                console.log('🔍 Cliente - Access token carregado do localStorage');
             }
 
             const userInfoData = localStorage.getItem('usp_oauth_user_info');
             if (userInfoData) {
                 this.userInfo = JSON.parse(userInfoData);
+                console.log('🔍 Cliente - User info carregado do localStorage');
             }
         }
     }
@@ -434,6 +449,7 @@ export class USPOAuthClient {
     clearStorage() {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('usp_oauth_request_token');
+            localStorage.removeItem('usp_oauth_token_secret');
             localStorage.removeItem('usp_oauth_access_token');
             localStorage.removeItem('usp_oauth_user_info');
         }
