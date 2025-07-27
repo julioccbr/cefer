@@ -4,19 +4,19 @@
 // Configurações OAuth da USP
 const ENVIRONMENTS = {
     development: {
-        requestTokenUrl: 'https://labs.uspdigital.usp.br/ws/oauth/requestToken',
-        authorizationUrl: 'https://labs.uspdigital.usp.br/ws/oauth/authorize',
-        accessTokenUrl: 'https://labs.uspdigital.usp.br/ws/oauth/accessToken',
-        userInfoUrl: 'https://labs.uspdigital.usp.br/ws/oauth/getUserInfo',
-        consumerKey: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1',
-        consumerSecret: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1'
+        requestTokenUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/request_token',
+        authorizationUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/authorize',
+        accessTokenUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/access_token',
+        userInfoUrl: 'https://dev.uspdigital.usp.br/wsusuario/oauth/usuariousp',
+        consumerKey: 'icmc_srss',
+        consumerSecret: '7tBFM3lSwaqud0Cq1Akf'
     },
     production: {
-        requestTokenUrl: 'https://uspdigital.usp.br/ws/oauth/requestToken',
-        authorizationUrl: 'https://uspdigital.usp.br/ws/oauth/authorize',
-        accessTokenUrl: 'https://uspdigital.usp.br/ws/oauth/accessToken',
-        userInfoUrl: 'https://uspdigital.usp.br/ws/oauth/getUserInfo',
-        consumerKey: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1',
+        requestTokenUrl: 'https://uspdigital.usp.br/wsusuario/oauth/request_token',
+        authorizationUrl: 'https://uspdigital.usp.br/wsusuario/oauth/authorize',
+        accessTokenUrl: 'https://uspdigital.usp.br/wsusuario/oauth/access_token',
+        userInfoUrl: 'https://uspdigital.usp.br/wsusuario/oauth/usuariousp',
+        consumerKey: 'icmc_srss',
         consumerSecret: 'cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1'
     }
 };
@@ -31,9 +31,12 @@ const getEnvironment = () => {
     return 'development';
 };
 
-// Verificar se estamos em modo mock (forçar para teste)
+// Verificar se estamos em modo mock (apenas para desenvolvimento local)
 const isMockMode = () => {
-    return true; // Força o modo mock para teste
+    if (typeof window !== 'undefined' && window.location) {
+        return window.location.hostname.includes('localhost') && window.location.search.includes('mock=true');
+    }
+    return false;
 };
 
 // Gerar nonce único

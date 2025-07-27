@@ -20,26 +20,49 @@ function USPCompleteAuthContent() {
 
                 const oauthToken = searchParams.get('oauth_token');
                 const oauthVerifier = searchParams.get('oauth_verifier');
+                const isMock = searchParams.get('mock') === 'true';
 
                 if (!oauthToken || !oauthVerifier) {
                     throw new Error('Parâmetros OAuth ausentes');
                 }
 
-                // Se estiver em modo mock, siga o fluxo normalmente
-                if (uspOAuthClient.mockMode) {
-                    // Simula o fluxo completo, não precisa de request token
+                let userData;
+
+                if (isMock) {
+                    // Dados mockados para desenvolvimento
+                    userData = {
+                        loginUsuario: "user123",
+                        nomeUsuario: "João Silva",
+                        emailPrincipalUsuario: "joao.silva@usp.br",
+                        tipoUsuario: "Aluno",
+                        numeroTelefoneFormatado: "(11) 99999-9999",
+                        vinculo: [
+                            {
+                                tipoVinculo: "Aluno",
+                                codigoSetor: "123",
+                                nomeAbreviadoSetor: "IME"
+                            }
+                        ]
+                    };
                 } else {
+                    // Autenticação real da USP
                     // Carregar request token do localStorage
                     uspOAuthClient.loadFromStorage();
                     if (!uspOAuthClient.requestToken) {
                         throw new Error('Request token não encontrado. Tente fazer login novamente.');
                     }
+
+                    const authResult = await uspOAuthClient.completeAuthentication(oauthVerifier);
+                    uspOAuthClient.saveToStorage();
+
+                    if (!authResult || !authResult.userInfo) {
+                        throw new Error('Falha ao obter dados do usuário da USP');
+                    }
+
+                    userData = authResult.userInfo;
                 }
 
-                const authResult = await uspOAuthClient.completeAuthentication(oauthVerifier);
-                uspOAuthClient.saveToStorage();
-
-                const userData = authResult.userInfo;
+                // Mapear dados do usuário
                 const user = {
                     id: userData.loginUsuario,
                     name: userData.nomeUsuario,
@@ -50,10 +73,12 @@ function USPCompleteAuthContent() {
                     uspData: userData
                 };
 
+                console.log('Dados do usuário USP:', user);
+
                 const loginResult = await loginUSP(user);
                 setStatus('success');
 
-                // Redirecionar só após o contexto estar atualizado
+                // Redirecionar baseado no resultado
                 setTimeout(() => {
                     if (loginResult.isFirstAccess) {
                         router.push('/completar-perfil');
@@ -75,8 +100,8 @@ function USPCompleteAuthContent() {
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center max-w-md mx-auto px-4">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F37021] mx-auto mb-4"></div>
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">Completando autenticação...</h2>
                     <p className="text-gray-600">Aguarde enquanto finalizamos seu login na USP.</p>
@@ -87,7 +112,7 @@ function USPCompleteAuthContent() {
 
     if (status === 'error') {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center max-w-md mx-auto px-4">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +134,7 @@ function USPCompleteAuthContent() {
 
     if (status === 'success') {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center max-w-md mx-auto px-4">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +155,7 @@ function USPCompleteAuthContent() {
 export default function USPCompleteAuth() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F37021] mx-auto mb-4"></div>
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">Carregando...</h2>
