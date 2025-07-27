@@ -24,11 +24,11 @@ const ENVIRONMENTS = {
 // Determinar ambiente baseado na URL
 const getEnvironment = () => {
     if (typeof window !== 'undefined' && window.location) {
-        return window.location.hostname.includes('localhost') || window.location.hostname.includes('dev')
+        return window.location.hostname.includes('localhost')
             ? 'development'
             : 'production';
     }
-    return 'development'; // Fallback para SSR
+    return 'production'; // Fallback para SSR - usar produção por padrão
 };
 
 // Gerar nonce único
