@@ -8,7 +8,7 @@ export async function GET(request) {
         const oauthVerifier = searchParams.get('oauth_verifier');
 
         // Verificar se estamos em modo mock (para desenvolvimento)
-        const isMock = request.url.includes('mock=true');
+        const isMock = oauthToken === 'mock_token' && oauthVerifier === 'mock_verifier';
 
         if (isMock) {
             // Simular dados de usuário da USP para desenvolvimento

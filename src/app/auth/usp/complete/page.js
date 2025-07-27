@@ -20,7 +20,9 @@ function USPCompleteAuthContent() {
 
                 const oauthToken = searchParams.get('oauth_token');
                 const oauthVerifier = searchParams.get('oauth_verifier');
-                const isMock = searchParams.get('mock') === 'true';
+
+                // Detectar modo mock baseado nos parâmetros
+                const isMock = oauthToken === 'mock_token' && oauthVerifier === 'mock_verifier';
 
                 if (!oauthToken || !oauthVerifier) {
                     throw new Error('Parâmetros OAuth ausentes');

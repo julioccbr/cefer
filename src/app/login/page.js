@@ -54,7 +54,7 @@ export default function LoginPage() {
         setLoading(true);
         // Redirecionar para o modo mock
         if (typeof window !== "undefined") {
-            window.location.href = `${window.location.origin}/api/auth/usp/callback?oauth_token=mock_token&oauth_verifier=mock_verifier&mock=true`;
+            window.location.href = `${window.location.origin}/api/auth/usp/callback?oauth_token=mock_token&oauth_verifier=mock_verifier`;
         }
     };
 
