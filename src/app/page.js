@@ -4,10 +4,34 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Navbar from "@/app/components/Navbar";
 import PrimaryButton from "@/app/components/PrimaryButton";
+import { uspOAuthClient } from "@/lib/uspOAuthClient";
 
 export default function HomePage() {
     const { user } = useAuth();
     const router = useRouter();
+
+    const handleUSPLogin = async () => {
+        try {
+            const callbackUrl = typeof window !== "undefined" && window.location
+                ? `${window.location.origin}/api/auth/usp/callback`
+                : "";
+
+            console.log('🔍 Home - Iniciando autenticação USP direta');
+            console.log('🔍 Home - Callback URL:', callbackUrl);
+
+            const result = await uspOAuthClient.authenticate(callbackUrl);
+
+            console.log('🔍 Home - Redirecionando para USP:', result.authorizationUrl);
+
+            if (typeof window !== "undefined") {
+                window.location.href = result.authorizationUrl;
+            }
+        } catch (error) {
+            console.error('❌ Home - Erro ao iniciar autenticação USP:', error);
+            // Em caso de erro, redirecionar para a página de login
+            router.push('/login');
+        }
+    };
 
     return (
         <div>
@@ -31,7 +55,7 @@ export default function HomePage() {
                         </div>
                         <div className="flex space-x-3">
                             <button
-                                onClick={() => router.push('/login')}
+                                onClick={handleUSPLogin}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                             >
                                 Entrar com USP
