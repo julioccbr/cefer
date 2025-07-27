@@ -49,6 +49,8 @@ function USPCompleteAuthContent() {
                 } else {
                     // Autenticação real da USP via servidor
                     console.log('🔍 Cliente - Iniciando autenticação via servidor');
+                    console.log('🔍 Cliente - Token:', oauthToken);
+                    console.log('🔍 Cliente - Verifier:', oauthVerifier);
 
                     const response = await fetch('/api/auth/usp/complete-auth', {
                         method: 'POST',
@@ -58,12 +60,16 @@ function USPCompleteAuthContent() {
                         body: JSON.stringify({ oauthToken, oauthVerifier })
                     });
 
+                    console.log('🔍 Cliente - Status da resposta:', response.status);
+
                     if (!response.ok) {
                         const errorData = await response.json();
+                        console.error('❌ Cliente - Erro na resposta:', errorData);
                         throw new Error(errorData.error || 'Erro na requisição ao servidor');
                     }
 
                     const data = await response.json();
+                    console.log('🔍 Cliente - Dados da resposta:', data);
 
                     if (!data.success) {
                         throw new Error(data.error || 'Falha ao obter dados do usuário da USP');
