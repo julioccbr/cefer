@@ -119,8 +119,8 @@ export class USPOAuth {
             const tokenData = new URLSearchParams(data);
 
             this.requestToken = {
-                token: tokenData.get('oauth_token'),
-                secret: tokenData.get('oauth_token_secret')
+                oauth_token: tokenData.get('oauth_token'),
+                oauth_token_secret: tokenData.get('oauth_token_secret')
             };
 
             return this.requestToken;
@@ -136,7 +136,7 @@ export class USPOAuth {
             throw new Error('Request token não obtido. Execute getRequestToken() primeiro.');
         }
 
-        return `${this.config.authorizeUrl}?oauth_token=${this.requestToken.token}`;
+        return `${this.config.authorizeUrl}?oauth_token=${this.requestToken.oauth_token}`;
     }
 
     // Passo 3: Trocar request token por access token
@@ -151,7 +151,7 @@ export class USPOAuth {
 
             const params = {
                 oauth_consumer_key: this.config.consumerKey,
-                oauth_token: this.requestToken.token,
+                oauth_token: this.requestToken.oauth_token,
                 oauth_signature_method: 'HMAC-SHA1',
                 oauth_timestamp: timestamp,
                 oauth_nonce: nonce,
@@ -160,7 +160,7 @@ export class USPOAuth {
             };
 
             const signatureBaseString = createSignatureBaseString('POST', this.config.accessTokenUrl, params);
-            const signature = generateSignature(signatureBaseString, this.config.consumerSecret, this.requestToken.secret);
+            const signature = generateSignature(signatureBaseString, this.config.consumerSecret, this.requestToken.oauth_token_secret);
             params.oauth_signature = signature;
 
             const response = await fetch(this.config.accessTokenUrl, {
@@ -179,8 +179,8 @@ export class USPOAuth {
             const tokenData = new URLSearchParams(data);
 
             this.accessToken = {
-                token: tokenData.get('oauth_token'),
-                secret: tokenData.get('oauth_token_secret')
+                oauth_token: tokenData.get('oauth_token'),
+                oauth_token_secret: tokenData.get('oauth_token_secret')
             };
 
             return this.accessToken;
@@ -202,7 +202,7 @@ export class USPOAuth {
 
             const params = {
                 oauth_consumer_key: this.config.consumerKey,
-                oauth_token: this.accessToken.token,
+                oauth_token: this.accessToken.oauth_token,
                 oauth_signature_method: 'HMAC-SHA1',
                 oauth_timestamp: timestamp,
                 oauth_nonce: nonce,
@@ -210,7 +210,7 @@ export class USPOAuth {
             };
 
             const signatureBaseString = createSignatureBaseString('POST', this.config.userInfoUrl, params);
-            const signature = generateSignature(signatureBaseString, this.config.consumerSecret, this.accessToken.secret);
+            const signature = generateSignature(signatureBaseString, this.config.consumerSecret, this.accessToken.oauth_token_secret);
             params.oauth_signature = signature;
 
             const response = await fetch(this.config.userInfoUrl, {
