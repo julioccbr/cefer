@@ -47,21 +47,30 @@ function USPCompleteAuthContent() {
                         ]
                     };
                 } else {
-                    // Autenticação real da USP
-                    // Carregar request token do localStorage
-                    uspOAuthClient.loadFromStorage();
-                    if (!uspOAuthClient.requestToken) {
-                        throw new Error('Request token não encontrado. Tente fazer login novamente.');
+                    // Autenticação real da USP via servidor
+                    console.log('🔍 Cliente - Iniciando autenticação via servidor');
+
+                    const response = await fetch('/api/auth/usp/complete-auth', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ oauthToken, oauthVerifier })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Erro na requisição ao servidor');
                     }
 
-                    const authResult = await uspOAuthClient.completeAuthentication(oauthVerifier);
-                    uspOAuthClient.saveToStorage();
+                    const data = await response.json();
 
-                    if (!authResult || !authResult.userInfo) {
-                        throw new Error('Falha ao obter dados do usuário da USP');
+                    if (!data.success) {
+                        throw new Error(data.error || 'Falha ao obter dados do usuário da USP');
                     }
 
-                    userData = authResult.userInfo;
+                    userData = data.userInfo;
+                    console.log('✅ Cliente - Dados do usuário obtidos:', userData);
                 }
 
                 // Mapear dados do usuário
