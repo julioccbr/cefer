@@ -56,7 +56,7 @@ export default function CompletarPerfilPage() {
     }
 
     if (!user) {
-        router.push('/login');
+        router.push('/');
         return null;
     }
 

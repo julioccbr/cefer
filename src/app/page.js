@@ -28,8 +28,8 @@ export default function HomePage() {
             }
         } catch (error) {
             console.error('❌ Home - Erro ao iniciar autenticação USP:', error);
-            // Em caso de erro, redirecionar para a página de login
-            router.push('/login');
+            // Em caso de erro, redirecionar para a página inicial
+            router.push('/');
         }
     };
 

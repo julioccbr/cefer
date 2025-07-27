@@ -78,7 +78,7 @@ export default function PerfilPage() {
 
     const handleLogout = () => {
         logout();
-        router.push('/login');
+        router.push('/');
     };
 
     if (!isClient) {
@@ -86,7 +86,7 @@ export default function PerfilPage() {
     }
 
     if (!user) {
-        router.push('/login');
+        router.push('/');
         return null;
     }
 
