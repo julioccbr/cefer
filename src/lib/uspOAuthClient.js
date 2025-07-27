@@ -116,16 +116,6 @@ export class USPOAuthClient {
 
     // Passo 1: Obter request token
     async getRequestToken(callbackUrl) {
-        // Se estamos em modo mock, simular o processo
-        if (this.mockMode) {
-            console.log('Modo mock ativado - simulando request token');
-            this.requestToken = {
-                oauth_token: 'mock_token_' + Date.now(),
-                oauth_token_secret: 'mock_secret_' + Date.now()
-            };
-            return this.requestToken;
-        }
-
         try {
             const timestamp = generateTimestamp();
             const nonce = generateNonce();
@@ -139,23 +129,38 @@ export class USPOAuthClient {
                 oauth_callback: callbackUrl
             };
 
+            console.log('🔍 Debug - Parâmetros OAuth:', params);
+            console.log('🔍 Debug - URL:', this.config.requestTokenUrl);
+
             const signatureBaseString = createSignatureBaseString('POST', this.config.requestTokenUrl, params);
             const signature = await generateSignature(signatureBaseString, this.config.consumerSecret);
             params.oauth_signature = signature;
 
+            console.log('🔍 Debug - Assinatura gerada:', signature);
+
+            const oauthHeader = createOAuthHeader(params);
+            console.log('🔍 Debug - Header OAuth:', oauthHeader);
+
             const response = await fetch(this.config.requestTokenUrl, {
                 method: 'POST',
                 headers: {
-                    'Authorization': createOAuthHeader(params),
+                    'Authorization': oauthHeader,
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
 
+            console.log('🔍 Debug - Status da resposta:', response.status);
+            console.log('🔍 Debug - Headers da resposta:', Object.fromEntries(response.headers.entries()));
+
             if (!response.ok) {
-                throw new Error(`Erro ao obter request token: ${response.status}`);
+                const errorText = await response.text();
+                console.error('❌ Erro na resposta:', errorText);
+                throw new Error(`Erro ao obter request token: ${response.status} - ${errorText}`);
             }
 
             const data = await response.text();
+            console.log('🔍 Debug - Dados da resposta:', data);
+
             const tokenData = new URLSearchParams(data);
 
             this.requestToken = {
@@ -163,9 +168,10 @@ export class USPOAuthClient {
                 oauth_token_secret: tokenData.get('oauth_token_secret')
             };
 
+            console.log('✅ Request token obtido:', this.requestToken);
             return this.requestToken;
         } catch (error) {
-            console.error('Erro ao obter request token:', error);
+            console.error('❌ Erro ao obter request token:', error);
             throw error;
         }
     }

@@ -38,14 +38,35 @@ function LoginPageContent() {
                 ? `${window.location.origin}/api/auth/usp/callback`
                 : "";
 
+            console.log('🔍 Debug - Iniciando autenticação USP');
+            console.log('🔍 Debug - Callback URL:', callbackUrl);
+
             const result = await uspOAuthClient.authenticate(callbackUrl);
+
+            console.log('🔍 Debug - Resultado da autenticação:', result);
 
             if (typeof window !== "undefined") {
                 window.location.href = result.authorizationUrl;
             }
         } catch (error) {
-            console.error('Erro ao iniciar autenticação USP:', error);
-            setError('Erro ao conectar com a USP. Tente novamente.');
+            console.error('❌ Erro detalhado ao iniciar autenticação USP:', error);
+
+            // Mostrar erro mais específico
+            let errorMessage = 'Erro ao conectar com a USP. Tente novamente.';
+
+            if (error.message.includes('CORS')) {
+                errorMessage = 'Erro de CORS: Domínio não autorizado pela USP.';
+            } else if (error.message.includes('401')) {
+                errorMessage = 'Erro de autenticação: Tokens inválidos.';
+            } else if (error.message.includes('403')) {
+                errorMessage = 'Acesso negado: URL de callback não configurada.';
+            } else if (error.message.includes('404')) {
+                errorMessage = 'URL da API da USP não encontrada.';
+            } else if (error.message.includes('500')) {
+                errorMessage = 'Erro interno do servidor da USP.';
+            }
+
+            setError(errorMessage);
             setLoading(false);
         }
     };
