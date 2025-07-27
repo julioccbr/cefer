@@ -28,18 +28,18 @@ Configure as URLs de retorno no painel administrativo da USP:
 
 **Produção:**
 - Acesse: https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
-- Adicione: `https://seu-dominio.com/api/auth/usp/callback`
+- Adicione: `https://cefer.vercel.app/api/auth/usp/callback`
 
 ### 3. Configuração do Projeto
 
-#### Atualizar URLs de Produção
+#### URLs de Produção Configuradas
 
-No arquivo `src/lib/config.js`, atualize as URLs de produção:
+As URLs de produção já estão configuradas no arquivo `src/lib/config.js`:
 
 ```javascript
 production: {
-    callbackUrl: 'https://SEU-DOMINIO.com/api/auth/usp/callback',
-    completeUrl: 'https://SEU-DOMINIO.com/auth/usp/complete'
+    callbackUrl: 'https://cefer.vercel.app/api/auth/usp/callback',
+    completeUrl: 'https://cefer.vercel.app/auth/usp/complete'
 }
 ```
 
@@ -92,6 +92,7 @@ O sistema obtém os seguintes dados da USP:
 
 ### Ambiente de Produção
 - URL de teste: https://uspdigital.usp.br/wsusuario/index_testeOAUTH.jsp
+- URL do projeto: https://cefer.vercel.app
 
 ## Modo de Desenvolvimento
 
@@ -100,6 +101,14 @@ Para testar sem a API real da USP:
 1. Acesse: `http://localhost:3000/login`
 2. Clique em "Modo Teste (Desenvolvimento)"
 3. O sistema usará dados mockados para simular a autenticação
+
+## Deploy na Vercel
+
+O projeto está configurado para deploy automático na Vercel:
+
+1. **Repositório**: https://github.com/julioccbr/cefer
+2. **Domínio**: https://cefer.vercel.app
+3. **Deploy automático**: Ativado (push para main)
 
 ## Troubleshooting
 
@@ -138,8 +147,15 @@ Para verificar os logs de acesso:
 
 ## Próximos Passos
 
-1. Configure as URLs de callback no painel da USP
-2. Teste a autenticação em desenvolvimento
-3. Configure as URLs de produção
-4. Teste em ambiente de produção
-5. Implemente logs de auditoria se necessário 
+1. ✅ Configure as URLs de callback no painel da USP
+2. ✅ Teste a autenticação em desenvolvimento
+3. ✅ Configure as URLs de produção
+4. 🔄 Teste em ambiente de produção
+5. 🔄 Implemente logs de auditoria se necessário
+
+## Status do Deploy
+
+- ✅ Código enviado para GitHub
+- ✅ Configuração da Vercel atualizada
+- 🔄 Aguardando deploy automático
+- 🔄 Teste da autenticação USP em produção 

@@ -7,8 +7,8 @@ export const config = {
             completeUrl: 'http://localhost:3000/auth/usp/complete'
         },
         production: {
-            callbackUrl: 'https://seu-projeto.vercel.app/api/auth/usp/callback',
-            completeUrl: 'https://seu-projeto.vercel.app/auth/usp/complete'
+            callbackUrl: 'https://cefer.vercel.app/api/auth/usp/callback',
+            completeUrl: 'https://cefer.vercel.app/auth/usp/complete'
         }
     },
 
