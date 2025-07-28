@@ -16,14 +16,16 @@ Para que a autenticação USP funcione, você **PRECISA** configurar as URLs de 
 
 No painel administrativo, você precisa adicionar as seguintes URLs:
 
-**URL de Callback Principal:**
+**URLs de Callback para Produção:**
 ```
 https://cefer.vercel.app/api/auth/usp/callback
+https://cefer.vercel.app/auth/usp/complete
 ```
 
-**URLs Adicionais (se necessário):**
+**URLs de Callback para Desenvolvimento (Localhost):**
 ```
-https://cefer.vercel.app/auth/usp/complete
+http://localhost:3000/api/auth/usp/callback
+http://localhost:3000/auth/usp/complete
 ```
 
 ### 3. Verificar Tokens de Acesso
@@ -34,12 +36,22 @@ Confirme que os tokens estão corretos:
 - Consumer Key: `icmc_srss`
 - Consumer Secret: `cF49rM91u4kk9qrRg4XXXAiIg4J35ibM9TnwR9H1`
 
+**Desenvolvimento:**
+- Consumer Key: `icmc_srss`
+- Consumer Secret: `7tBFM3lSwaqud0Cq1Akf`
+
 ### 4. Testar a Configuração
 
 Após configurar as URLs:
 
-1. Acesse: https://cefer.vercel.app/login
-2. Clique em "Entrar com Senha Única USP"
+**Para Produção:**
+1. Acesse: https://cefer.vercel.app
+2. Clique em "Entrar com USP"
+3. Deve redirecionar para a página de login da USP
+
+**Para Desenvolvimento:**
+1. Acesse: http://localhost:3000
+2. Clique em "Entrar com USP"
 3. Deve redirecionar para a página de login da USP
 
 ## Possíveis Problemas e Soluções
@@ -52,7 +64,7 @@ Após configurar as URLs:
 3. Domínio não autorizado pela USP
 
 **Soluções:**
-1. ✅ Configure as URLs de callback no painel da USP
+1. ✅ Configure as URLs de callback no painel da USP (incluindo localhost)
 2. ✅ Verifique se os tokens estão corretos
 3. ✅ Aguarde alguns minutos após a configuração
 
@@ -60,18 +72,23 @@ Após configurar as URLs:
 
 **Causa:** URL de callback não configurada corretamente
 
-**Solução:** Verifique se a URL `https://cefer.vercel.app/api/auth/usp/callback` está registrada no painel da USP
+**Solução:** Verifique se as URLs estão registradas no painel da USP:
+- `https://cefer.vercel.app/api/auth/usp/callback` (produção)
+- `http://localhost:3000/api/auth/usp/callback` (desenvolvimento)
 
 ### ❌ Erro de CORS
 
 **Causa:** Domínio não autorizado
 
-**Solução:** Certifique-se de que `cefer.vercel.app` está na lista de domínios permitidos
+**Solução:** Certifique-se de que os domínios estão na lista de permitidos:
+- `cefer.vercel.app` (produção)
+- `localhost:3000` (desenvolvimento)
 
 ## Status da Configuração
 
 - ✅ **Código implementado**: Autenticação OAuth 1.0a funcionando
 - ✅ **Tokens configurados**: Consumer key e secret corretos
+- ✅ **Redirecionamento dinâmico**: Respeita o ambiente atual
 - 🔄 **URLs de callback**: **PRECISAM SER CONFIGURADAS NO PAINEL DA USP**
 - 🔄 **Teste final**: Após configuração das URLs
 
@@ -85,10 +102,10 @@ Se precisar de ajuda com a configuração no painel da USP:
 
 ## Próximos Passos
 
-1. **Configure as URLs de callback** no painel da USP
-2. **Teste a autenticação** em https://cefer.vercel.app/login
+1. **Configure as URLs de callback** no painel da USP (incluindo localhost)
+2. **Teste a autenticação** em ambos os ambientes
 3. **Verifique os logs** no painel da USP para confirmar o funcionamento
 
 ---
 
-**⚠️ ATENÇÃO:** Sem a configuração das URLs de callback no painel da USP, a autenticação não funcionará! 
+**⚠️ ATENÇÃO:** Sem a configuração das URLs de callback no painel da USP, a autenticação não funcionará em nenhum ambiente! 

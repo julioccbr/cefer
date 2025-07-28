@@ -10,10 +10,10 @@ export async function GET(request) {
 
         if (!oauthToken || !oauthVerifier) {
             console.error('❌ Callback - Parâmetros OAuth ausentes');
-            return NextResponse.redirect(new URL('/login?error=missing_params', request.url));
+            return NextResponse.redirect(new URL('/?error=missing_params', request.url));
         }
 
-        // Redirecionar para a página de completar autenticação
+        // Redirecionar para a página de completar autenticação no ambiente atual
         const redirectUrl = `/auth/usp/complete?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`;
         console.log('✅ Callback - Redirecionando para:', redirectUrl);
 
@@ -21,6 +21,6 @@ export async function GET(request) {
 
     } catch (error) {
         console.error('❌ Callback - Erro geral:', error);
-        return NextResponse.redirect(new URL('/login?error=callback_error', request.url));
+        return NextResponse.redirect(new URL('/?error=callback_error', request.url));
     }
 } 

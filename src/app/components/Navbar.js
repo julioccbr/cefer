@@ -32,8 +32,8 @@ export default function Navbar({ titulo }) {
             <ul className="hidden md:flex gap-[24px] text-[#141414] font-medium">
                 <li><Link href="/">Página inicial</Link></li>
                 <li><Link href="/espacos">Agendamentos</Link></li>
-                <li><a href="#">Grupos de esporte</a></li>
-                <li><a href="#">Eventos</a></li>
+                <li><Link href="/grupos">Grupos de esporte</Link></li>
+                <li><Link href="/eventos">Eventos</Link></li>
                 {user && <li><Link href="/perfil">Perfil</Link></li>}
             </ul>
 
